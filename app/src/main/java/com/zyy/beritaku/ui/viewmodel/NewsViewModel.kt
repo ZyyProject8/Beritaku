@@ -2,6 +2,7 @@ package com.zyy.beritaku.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zyy.beritaku.data.repository.ApiKeyMissingException
 import com.zyy.beritaku.data.repository.NewsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,9 +30,13 @@ class NewsViewModel(
             result.onSuccess { articles ->
                 _uiState.value = NewsUiState.Success(articles = articles, selectedCategory = category)
             }.onFailure { error ->
-                _uiState.value = NewsUiState.Error(
-                    error.localizedMessage ?: "Terjadi kesalahan saat memuat berita."
-                )
+                if (error is ApiKeyMissingException) {
+                    _uiState.value = NewsUiState.ApiKeyMissing
+                } else {
+                    _uiState.value = NewsUiState.Error(
+                        error.localizedMessage ?: "Terjadi kesalahan saat memuat berita."
+                    )
+                }
             }
         }
     }
@@ -47,9 +52,13 @@ class NewsViewModel(
             result.onSuccess { articles ->
                 _uiState.value = NewsUiState.Success(articles = articles, selectedCategory = currentCategory)
             }.onFailure { error ->
-                _uiState.value = NewsUiState.Error(
-                    error.localizedMessage ?: "Pencarian berita gagal."
-                )
+                if (error is ApiKeyMissingException) {
+                    _uiState.value = NewsUiState.ApiKeyMissing
+                } else {
+                    _uiState.value = NewsUiState.Error(
+                        error.localizedMessage ?: "Pencarian berita gagal."
+                    )
+                }
             }
         }
     }

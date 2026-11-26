@@ -11,7 +11,7 @@ object RetrofitClient {
     private const val BASE_URL = "https://newsapi.org/"
 
     // Masukkan API key dari https://newsapi.org/ di sini
-    const val API_KEY = "YOUR_API_KEY_HERE"
+    const val API_KEY = "5c401365e0bb41769490a4842def71c3"
 
     private val userAgentInterceptor = Interceptor { chain ->
         val originalRequest = chain.request()

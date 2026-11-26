@@ -4,6 +4,7 @@ import com.zyy.beritaku.data.model.Article
 
 sealed interface NewsUiState {
     object Loading : NewsUiState
+    object ApiKeyMissing : NewsUiState
     data class Success(
         val articles: List<Article>,
         val selectedCategory: String = "general"

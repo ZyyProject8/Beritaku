@@ -24,7 +24,7 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -32,6 +32,8 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -154,7 +156,7 @@ fun HomeScreen(
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = "Jelajahi berita pilihan hari ini",
+                        text = "Portal Berita Real-time & Terpercaya",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -164,7 +166,6 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Tombol Notifikasi dengan Badge
                     IconButton(
                         onClick = { viewModel.loadNews() },
                         modifier = Modifier
@@ -180,7 +181,6 @@ fun HomeScreen(
                         )
                     }
 
-                    // Avatar Mini
                     Box(
                         modifier = Modifier
                             .size(42.dp)
@@ -207,7 +207,7 @@ fun HomeScreen(
                 },
                 placeholder = {
                     Text(
-                        "Cari berita, topik, isu terkini...",
+                        "Cari topik berita...",
                         color = MaterialTheme.colorScheme.outline
                     )
                 },
@@ -292,10 +292,73 @@ fun HomeScreen(
                             )
                             Spacer(modifier = Modifier.height(14.dp))
                             Text(
-                                text = "Menyiapkan berita pilihan...",
+                                text = "Menghubungkan ke NewsAPI...",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.outline
                             )
+                        }
+                    }
+                    is NewsUiState.ApiKeyMissing -> {
+                        // Tampilan Informatif Ketika API Key Belum Diisi
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Surface(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = CircleShape,
+                                    modifier = Modifier.size(64.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            imageVector = Icons.Default.Key,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            modifier = Modifier.size(32.dp)
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Text(
+                                    text = "Menunggu API Key",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Text(
+                                    text = "Aplikasi ini siap menampilkan berita langsung secara live. Masukkan API Key dari newsapi.org ke file RetrofitClient.kt untuk memulai.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center
+                                )
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                Button(
+                                    onClick = { viewModel.loadNews() },
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Periksa & Muat Ulang")
+                                }
+                            }
                         }
                     }
                     is NewsUiState.Error -> {
@@ -326,7 +389,6 @@ fun HomeScreen(
                         }
                     }
                     is NewsUiState.Success -> {
-                        // Tampilan Tab "Disimpan"
                         if (selectedBottomTab == 2) {
                             val savedArticles = state.articles.filter { it.url in bookmarkedUrls }
                             if (savedArticles.isEmpty()) {
@@ -363,18 +425,17 @@ fun HomeScreen(
                             }
                         } else if (state.articles.isEmpty()) {
                             Text(
-                                text = "Tidak ada berita ditemukan untuk pencarian ini.",
+                                text = "Tidak ada berita ditemukan untuk topik ini.",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.outline
                             )
                         } else {
-                            // Tampilan Normal (Beranda / Eksplor)
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.spacedBy(14.dp),
                                 contentPadding = PaddingValues(top = 8.dp, bottom = 20.dp)
                             ) {
-                                // 1. Banner Berita Utama (Hero Featured Card)
+                                // 1. Banner Berita Utama
                                 item {
                                     val topArticle = state.articles.first()
                                     val isBookmarked = topArticle.url in bookmarkedUrls
@@ -390,7 +451,7 @@ fun HomeScreen(
                                     )
                                 }
 
-                                // 2. Sub-Header "Berita Terbaru"
+                                // 2. Sub-Header Berita Terbaru
                                 item {
                                     Row(
                                         modifier = Modifier
@@ -411,7 +472,7 @@ fun HomeScreen(
                                     }
                                 }
 
-                                // 3. Daftar Kartu Berita (Mulai dari indeks ke-1)
+                                // 3. Daftar Kartu Berita
                                 val remainingArticles = state.articles.drop(1)
                                 items(remainingArticles) { article ->
                                     val isBookmarked = article.url in bookmarkedUrls
