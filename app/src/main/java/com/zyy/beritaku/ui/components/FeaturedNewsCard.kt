@@ -119,13 +119,13 @@ fun FeaturedNewsCard(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                // Badge "⚡ BERITA UTAMA"
+                // Badge "BERITA UTAMA"
                 Surface(
                     color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = "⚡ BERITA UTAMA",
+                        text = "BERITA UTAMA",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),

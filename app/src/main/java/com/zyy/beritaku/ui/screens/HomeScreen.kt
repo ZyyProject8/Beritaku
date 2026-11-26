@@ -82,13 +82,13 @@ fun HomeScreen(
     val bookmarkedUrls = remember { mutableStateListOf<String>() }
 
     val categories = listOf(
-        "🔥 Semua" to "general",
-        "💻 Teknologi" to "technology",
-        "💼 Bisnis" to "business",
-        "⚽ Olahraga" to "sports",
-        "🎬 Hiburan" to "entertainment",
-        "🩺 Kesehatan" to "health",
-        "🔬 Sains" to "science"
+        "Semua" to "general",
+        "Teknologi" to "technology",
+        "Bisnis" to "business",
+        "Olahraga" to "sports",
+        "Hiburan" to "entertainment",
+        "Kesehatan" to "health",
+        "Sains" to "science"
     )
 
     Scaffold(
@@ -150,7 +150,7 @@ fun HomeScreen(
             ) {
                 Column {
                     Text(
-                        text = "Selamat Datang 👋",
+                        text = "Selamat Datang",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.onBackground
