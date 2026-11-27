@@ -42,6 +42,8 @@ fun NewsItemCard(
     article: Article,
     isBookmarked: Boolean = false,
     onBookmarkClick: () -> Unit = {},
+    readTimeLabel: String = "3 min baca",
+    todayLabel: String = "Hari ini",
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -52,8 +54,12 @@ fun NewsItemCard(
             .clickable {
                 article.url?.let { link ->
                     if (link.isNotBlank()) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-                        context.startActivity(intent)
+                        try {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 }
             },
@@ -69,13 +75,11 @@ fun NewsItemCard(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Kolom Informasi Teks di Kiri
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 12.dp)
             ) {
-                // Sumber Berita
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -94,7 +98,7 @@ fun NewsItemCard(
                     }
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (!article.publishedAt.isNullOrBlank()) article.publishedAt.take(10) else "Hari ini",
+                        text = if (!article.publishedAt.isNullOrBlank()) article.publishedAt.take(10) else todayLabel,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.outline,
                         fontSize = 11.sp
@@ -103,7 +107,6 @@ fun NewsItemCard(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // Judul Berita (2 Baris)
                 Text(
                     text = article.title ?: "Tanpa Judul",
                     style = MaterialTheme.typography.titleMedium.copy(fontSize = 15.sp),
@@ -116,7 +119,6 @@ fun NewsItemCard(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Deskripsi Singkat Berita
                 if (!article.description.isNullOrBlank()) {
                     Text(
                         text = article.description,
@@ -129,14 +131,13 @@ fun NewsItemCard(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // Tombol Simpan / Bookmark
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "3 min baca",
+                        text = readTimeLabel,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -146,7 +147,7 @@ fun NewsItemCard(
                     ) {
                         Icon(
                             imageVector = if (isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                            contentDescription = "Simpan",
+                            contentDescription = "Bookmark",
                             tint = if (isBookmarked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                             modifier = Modifier.size(18.dp)
                         )
@@ -154,7 +155,6 @@ fun NewsItemCard(
                 }
             }
 
-            // Thumbnail Foto Berita di Kanan (Square Rounded)
             if (!article.urlToImage.isNullOrBlank()) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)

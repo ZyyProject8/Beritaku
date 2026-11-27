@@ -8,13 +8,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -48,6 +46,9 @@ fun FeaturedNewsCard(
     article: Article,
     isBookmarked: Boolean,
     onBookmarkClick: () -> Unit,
+    breakingNewsLabel: String = "BERITA UTAMA",
+    todayLabel: String = "Hari ini",
+    cardHeight: androidx.compose.ui.unit.Dp = 230.dp,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -55,12 +56,16 @@ fun FeaturedNewsCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(230.dp)
+            .height(cardHeight)
             .clickable {
                 article.url?.let { link ->
                     if (link.isNotBlank()) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-                        context.startActivity(intent)
+                        try {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 }
             },
@@ -68,7 +73,6 @@ fun FeaturedNewsCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            // Gambar Background Berita
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(article.urlToImage)
@@ -79,7 +83,6 @@ fun FeaturedNewsCard(
                 modifier = Modifier.fillMaxSize()
             )
 
-            // Gradient Overlay Gelap agar Teks Sangat Jelas Terbaca
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -94,7 +97,6 @@ fun FeaturedNewsCard(
                     )
             )
 
-            // Bookmark Button di Pojok Kanan Atas
             IconButton(
                 onClick = onBookmarkClick,
                 modifier = Modifier
@@ -106,26 +108,24 @@ fun FeaturedNewsCard(
             ) {
                 Icon(
                     imageVector = if (isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                    contentDescription = "Simpan Berita",
+                    contentDescription = "Bookmark",
                     tint = if (isBookmarked) Color(0xFFFFD700) else Color.White,
                     modifier = Modifier.size(20.dp)
                 )
             }
 
-            // Konten Teks di Bagian Bawah
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                // Badge "BERITA UTAMA"
                 Surface(
                     color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = "BERITA UTAMA",
+                        text = breakingNewsLabel,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -134,9 +134,8 @@ fun FeaturedNewsCard(
                     )
                 }
 
-                // Judul Berita Utama
                 Text(
-                    text = article.title ?: "Berita Utama Hari Ini",
+                    text = article.title ?: "Berita Utama",
                     style = MaterialTheme.typography.titleMedium.copy(fontSize = 17.sp),
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -144,7 +143,6 @@ fun FeaturedNewsCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                // Info Sumber & Waktu
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -159,7 +157,7 @@ fun FeaturedNewsCard(
                         color = Color(0xFFAAAAAA)
                     )
                     Text(
-                        text = if (!article.publishedAt.isNullOrBlank()) article.publishedAt.take(10) else "Hari ini",
+                        text = if (!article.publishedAt.isNullOrBlank()) article.publishedAt.take(10) else todayLabel,
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFFAAAAAA)
                     )

@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Beritaku</string>
+    <string name="greeting">Welcome</string>
+    <string name="subtitle">Real-time &amp; Trusted News Portal</string>
+    <string name="search_placeholder">Search news topics...</string>
+    
+    <!-- Categories -->
+    <string name="category_all">All</string>
+    <string name="category_tech">Technology</string>
+    <string name="category_business">Business</string>
+    <string name="category_sports">Sports</string>
+    <string name="category_entertainment">Entertainment</string>
+    <string name="category_health">Health</string>
+    <string name="category_science">Science</string>
+    
+    <!-- Section -->
+    <string name="breaking_news">BREAKING NEWS</string>
+    <string name="latest_news">Latest News</string>
+    <string name="refresh">Refresh</string>
+    <string name="loading">Connecting to NewsAPI...</string>
+    <string name="no_news">No news found for this topic.</string>
+    <string name="try_again">Try Again</string>
+    <string name="read_time">3 min read</string>
+    <string name="today">Today</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_explore">Explore</string>
+    <string name="nav_saved">Saved</string>
+    <string name="nav_profile">Profile</string>
+    <string name="no_saved_news">No saved news yet</string>
+
+    <!-- Not Night & Night Mode -->
+    <string name="theme_light">Light Mode (Not Night)</string>
+    <string name="theme_dark">Dark Mode (Night)</string>
+    <string name="lang_id">ID</string>
+    <string name="lang_en">EN</string>
+</resources>

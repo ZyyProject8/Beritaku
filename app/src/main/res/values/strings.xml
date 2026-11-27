@@ -1,3 +1,38 @@
 <resources>
     <string name="app_name">Beritaku</string>
+    <string name="greeting">Selamat Datang</string>
+    <string name="subtitle">Portal Berita Real-time &amp; Terpercaya</string>
+    <string name="search_placeholder">Cari topik berita...</string>
+    
+    <!-- Kategori -->
+    <string name="category_all">Semua</string>
+    <string name="category_tech">Teknologi</string>
+    <string name="category_business">Bisnis</string>
+    <string name="category_sports">Olahraga</string>
+    <string name="category_entertainment">Hiburan</string>
+    <string name="category_health">Kesehatan</string>
+    <string name="category_science">Sains</string>
+    
+    <!-- Section -->
+    <string name="breaking_news">BERITA UTAMA</string>
+    <string name="latest_news">Berita Terbaru</string>
+    <string name="refresh">Segarkan</string>
+    <string name="loading">Menghubungkan ke NewsAPI...</string>
+    <string name="no_news">Tidak ada berita ditemukan untuk topik ini.</string>
+    <string name="try_again">Coba Lagi</string>
+    <string name="read_time">3 min baca</string>
+    <string name="today">Hari ini</string>
+
+    <!-- Navigasi Bawah -->
+    <string name="nav_home">Beranda</string>
+    <string name="nav_explore">Eksplor</string>
+    <string name="nav_saved">Disimpan</string>
+    <string name="nav_profile">Profil</string>
+    <string name="no_saved_news">Belum ada berita yang disimpan</string>
+
+    <!-- Mode Not Night & Night -->
+    <string name="theme_light">Mode Terang (Not Night)</string>
+    <string name="theme_dark">Mode Gelap (Night)</string>
+    <string name="lang_id">ID</string>
+    <string name="lang_en">EN</string>
 </resources>
