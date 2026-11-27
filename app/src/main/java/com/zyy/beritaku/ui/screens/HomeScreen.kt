@@ -30,13 +30,17 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BrightnessAuto
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -45,6 +49,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -57,10 +62,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -69,8 +79,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -109,8 +122,11 @@ fun HomeScreen(
     var selectedCategoryCode by rememberSaveable { mutableStateOf("general") }
     val bookmarkedUrls = rememberSaveable { mutableStateListOf<String>() }
 
+    // State Pengaturan
+    var isNotificationsEnabled by rememberSaveable { mutableStateOf(true) }
+
     // Multi Bahasa Dictionary
-    val greetingText = if (isEnglish) "Welcome" else "Selamat Datang"
+    val greetingText = "Beritaku"
     val subtitleText = if (isEnglish) "Real-time & Trusted News Portal" else "Portal Berita Real-time & Terpercaya"
     val searchPlaceholder = if (isEnglish) "Search news topics..." else "Cari topik berita..."
     val breakingNewsLabel = if (isEnglish) "BREAKING NEWS" else "BERITA UTAMA"
@@ -199,7 +215,7 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            // Tampilan Khusus Tab Pengaturan / Profil (Tab 3)
+            // Tampilan Khusus Tab Pengaturan (Tab 3)
             if (selectedBottomTab == 3) {
                 LazyColumn(
                     modifier = Modifier
@@ -210,19 +226,19 @@ fun HomeScreen(
                 ) {
                     item {
                         Text(
-                            text = if (isEnglish) "Settings & Profile" else "Pengaturan & Profil",
+                            text = if (isEnglish) "Settings" else "Pengaturan",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
-                            text = if (isEnglish) "Manage language, theme, and app information" else "Kelola bahasa, tema, dan informasi aplikasi",
+                            text = if (isEnglish) "Language and notification preferences" else "Preferensi bahasa dan notifikasi aplikasi",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline
                         )
                     }
 
-                    // Card Profil Pengguna
+                    // Card 1: Notifikasi Berita Utama
                     item {
                         Card(
                             shape = RoundedCornerShape(20.dp),
@@ -233,40 +249,46 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(54.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.primary),
-                                    contentAlignment = Alignment.Center
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(1f)
                                 ) {
-                                    Text(
-                                        text = "BK",
-                                        color = MaterialTheme.colorScheme.onPrimary,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp
+                                    Icon(
+                                        imageVector = Icons.Default.Notifications,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(22.dp)
                                     )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Column {
+                                        Text(
+                                            text = if (isEnglish) "Breaking News Alerts" else "Notifikasi Berita Utama",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = if (isEnglish) "Receive notifications for major headlines" else "Dapatkan info langsung saat ada berita penting",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.outline
+                                        )
+                                    }
                                 }
-                                Spacer(modifier = Modifier.width(14.dp))
-                                Column {
-                                    Text(
-                                        text = if (isEnglish) "Beritaku Reader" else "Pembaca Beritaku",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold
+                                Switch(
+                                    checked = isNotificationsEnabled,
+                                    onCheckedChange = { isNotificationsEnabled = it },
+                                    colors = SwitchDefaults.colors(
+                                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
                                     )
-                                    Text(
-                                        text = if (isEnglish) "Guest User • RPL Android" else "Pengguna Tamu • RPL Android",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.outline
-                                    )
-                                }
+                                )
                             }
                         }
                     }
 
-                    // Card Pengaturan Bahasa (Language)
+                    // Card 2: Pengaturan Bahasa (Language)
                     item {
                         Card(
                             shape = RoundedCornerShape(20.dp),
@@ -358,116 +380,6 @@ fun HomeScreen(
                             }
                         }
                     }
-
-                    // Card Pengaturan Tema Tampilan (Mode Not Night & Night Otomatis Ikut Sistem)
-                    item {
-                        Card(
-                            shape = RoundedCornerShape(20.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Default.BrightnessAuto,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(22.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                    Column {
-                                        Text(
-                                            text = if (isEnglish) "Display Theme" else "Tema Tampilan",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = if (isEnglish) "Dark & Light mode behavior" else "Perilaku mode Gelap & Terang",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.outline
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(14.dp))
-                                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                                        .padding(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = if (isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(22.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Column {
-                                        Text(
-                                            text = if (isEnglish) "Following Device System Mode" else "Otomatis Mengikuti Sistem HP",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = if (isDarkMode)
-                                                (if (isEnglish) "Active: Night Mode (Dark)" else "Aktif: Mode Gelap (Night)")
-                                            else
-                                                (if (isEnglish) "Active: Not Night Mode (Light)" else "Aktif: Mode Terang (Not Night)"),
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = MaterialTheme.colorScheme.outline
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Card Informasi Aplikasi & API
-                    item {
-                        Card(
-                            shape = RoundedCornerShape(20.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Default.Info,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                    Text(
-                                        text = if (isEnglish) "App & API Details" else "Detail Aplikasi & API",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Text(
-                                    text = "API Provider: NewsAPI.org (Live Headliner)",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = if (isEnglish) "Connection: Verified (200 OK)" else "Status Koneksi: Terverifikasi (200 OK)",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = "Toolkit: 100% Jetpack Compose (Material 3)",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
                 }
             } else {
                 // Tampilan Normal (Header Bersih & Rapi untuk Home, Eksplor, dan Disimpan)
@@ -475,106 +387,77 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = contentHorizontalPadding, vertical = headerVerticalPadding),
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = greetingText,
-                            style = if (isLandscape) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
+                            text = when (selectedBottomTab) {
+                                1 -> if (isEnglish) "Explore News" else "Eksplor Berita"
+                                2 -> if (isEnglish) "Saved Articles" else "Berita Disimpan"
+                                else -> "Beritaku"
+                            },
+                            style = if (isLandscape) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
-                            text = subtitleText,
+                            text = when (selectedBottomTab) {
+                                1 -> if (isEnglish) "Search and explore stories worldwide" else "Cari dan temukan berita dari berbagai topik"
+                                2 -> if (isEnglish) "Articles bookmarked on this device" else "Kumpulan berita yang telah Anda simpan"
+                                else -> subtitleText
+                            },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline
                         )
                     }
+                }
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Tombol Refresh
-                        IconButton(
-                            onClick = { viewModel.loadNews(selectedCategoryCode) },
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
-                        ) {
+                // Kolom Pencarian: HANYA MUNCUL DI HALAMAN EKSPLOR (selectedBottomTab == 1)
+                if (selectedBottomTab == 1) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = {
+                            searchQuery = it
+                            viewModel.searchNews(it)
+                        },
+                        placeholder = {
+                            Text(
+                                searchPlaceholder,
+                                color = MaterialTheme.colorScheme.outline,
+                                fontSize = 13.sp
+                            )
+                        },
+                        leadingIcon = {
                             Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = refreshLabel,
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp)
                             )
-                        }
-
-                        // Avatar Profil (Klik untuk langsung menuju tab Pengaturan & Profil)
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary)
-                                .clickable { selectedBottomTab = 3 },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "BK",
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                            )
-                        }
-                    }
-                }
-
-                // Kolom Pencarian
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = {
-                        searchQuery = it
-                        viewModel.searchNews(it)
-                    },
-                    placeholder = {
-                        Text(
-                            searchPlaceholder,
-                            color = MaterialTheme.colorScheme.outline,
-                            fontSize = 13.sp
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    },
-                    trailingIcon = {
-                        if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = {
-                                searchQuery = ""
-                                viewModel.loadNews(selectedCategoryCode)
-                            }) {
-                                Icon(Icons.Default.Close, contentDescription = "Clear", modifier = Modifier.size(18.dp))
+                        },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = {
+                                    searchQuery = ""
+                                    viewModel.loadNews(selectedCategoryCode)
+                                }) {
+                                    Icon(Icons.Default.Close, contentDescription = "Clear", modifier = Modifier.size(18.dp))
+                                }
                             }
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = contentHorizontalPadding, vertical = if (isLandscape) 2.dp else 4.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = contentHorizontalPadding, vertical = if (isLandscape) 2.dp else 4.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        )
                     )
-                )
+                }
 
                 // Baris Filter Kategori
                 val scrollState = rememberScrollState()
@@ -779,59 +662,69 @@ fun HomeScreen(
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                                     contentPadding = PaddingValues(top = 6.dp, bottom = 18.dp)
                                 ) {
-                                    item(span = { GridItemSpan(maxLineSpan) }) {
-                                        val topArticle = state.articles.first()
-                                        val isBookmarked = topArticle.url in bookmarkedUrls
-                                        FeaturedNewsCard(
-                                            article = topArticle,
-                                            isBookmarked = isBookmarked,
-                                            onBookmarkClick = {
-                                                topArticle.url?.let { url ->
-                                                    if (isBookmarked) bookmarkedUrls.remove(url)
-                                                    else bookmarkedUrls.add(url)
-                                                }
-                                            },
-                                            breakingNewsLabel = breakingNewsLabel,
-                                            todayLabel = todayLabel,
-                                            cardHeight = heroBannerHeight
-                                        )
-                                    }
+                                    if (selectedBottomTab == 0) {
+                                        // Halaman Beranda: Banner Berita Utama + List Berita Terbaru (Tanpa Kolom Pencarian)
+                                        item(span = { GridItemSpan(maxLineSpan) }) {
+                                            val topArticle = state.articles.first()
+                                            val isBookmarked = topArticle.url in bookmarkedUrls
+                                            FeaturedNewsCard(
+                                                article = topArticle,
+                                                isBookmarked = isBookmarked,
+                                                onBookmarkClick = {
+                                                    topArticle.url?.let { url ->
+                                                        if (isBookmarked) bookmarkedUrls.remove(url)
+                                                        else bookmarkedUrls.add(url)
+                                                    }
+                                                },
+                                                breakingNewsLabel = breakingNewsLabel,
+                                                todayLabel = todayLabel,
+                                                cardHeight = heroBannerHeight
+                                            )
+                                        }
 
-                                    item(span = { GridItemSpan(maxLineSpan) }) {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(top = 4.dp),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
+                                        item(span = { GridItemSpan(maxLineSpan) }) {
                                             Text(
                                                 text = latestNewsLabel,
                                                 style = MaterialTheme.typography.titleMedium,
                                                 fontWeight = FontWeight.Bold,
-                                                color = MaterialTheme.colorScheme.onBackground
+                                                color = MaterialTheme.colorScheme.onBackground,
+                                                modifier = Modifier.padding(top = 4.dp)
                                             )
-                                            TextButton(onClick = { viewModel.loadNews(selectedCategoryCode) }) {
-                                                Text(refreshLabel)
-                                            }
                                         }
-                                    }
 
-                                    val remainingArticles = state.articles.drop(1)
-                                    items(remainingArticles) { article ->
-                                        val isBookmarked = article.url in bookmarkedUrls
-                                        NewsItemCard(
-                                            article = article,
-                                            isBookmarked = isBookmarked,
-                                            onBookmarkClick = {
-                                                article.url?.let { url ->
-                                                    if (isBookmarked) bookmarkedUrls.remove(url)
-                                                    else bookmarkedUrls.add(url)
-                                                }
-                                            },
-                                            readTimeLabel = readTimeLabel,
-                                            todayLabel = todayLabel
-                                        )
+                                        val remainingArticles = state.articles.drop(1)
+                                        items(remainingArticles) { article ->
+                                            val isBookmarked = article.url in bookmarkedUrls
+                                            NewsItemCard(
+                                                article = article,
+                                                isBookmarked = isBookmarked,
+                                                onBookmarkClick = {
+                                                    article.url?.let { url ->
+                                                        if (isBookmarked) bookmarkedUrls.remove(url)
+                                                        else bookmarkedUrls.add(url)
+                                                    }
+                                                },
+                                                readTimeLabel = readTimeLabel,
+                                                todayLabel = todayLabel
+                                            )
+                                        }
+                                    } else {
+                                        // Halaman Eksplor: Semua berita (hasil pencarian/kategori) langsung dalam kartu grid
+                                        items(state.articles) { article ->
+                                            val isBookmarked = article.url in bookmarkedUrls
+                                            NewsItemCard(
+                                                article = article,
+                                                isBookmarked = isBookmarked,
+                                                onBookmarkClick = {
+                                                    article.url?.let { url ->
+                                                        if (isBookmarked) bookmarkedUrls.remove(url)
+                                                        else bookmarkedUrls.add(url)
+                                                    }
+                                                },
+                                                readTimeLabel = readTimeLabel,
+                                                todayLabel = todayLabel
+                                            )
+                                        }
                                     }
                                 }
                             }
